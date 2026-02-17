@@ -466,8 +466,18 @@
       }, 2000);
     }
 
+    // Desktop - hover pe bhaago
     noBtn.addEventListener('mouseover', runAway);
-    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); runAway(); });
+
+    // Phone - touch pe message bhi aao aur bhaago bhi
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      showToast(noMessages[noClickCount % noMessages.length]);
+      noClickCount++;
+      runAway();
+    });
+
+    // Desktop click pe message
     noBtn.addEventListener('click', () => {
       showToast(noMessages[noClickCount % noMessages.length]);
       noClickCount++;
