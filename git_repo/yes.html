@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💌 A Question For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rose: #e8274b;
+      --rose-light: #f5607a;
+      --rose-pale: #fce8ed;
+      --gold: #d4a853;
+      --cream: #fff8f0;
+      --dark: #1a0a0e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    /* ─── STARRY CANVAS ─── */
+    #stars-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ─── PETALS ─── */
+    .petal {
+      position: fixed;
+      width: 12px;
+      height: 18px;
+      border-radius: 50% 0 50% 0;
+      opacity: 0;
+      animation: petalFall linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes petalFall {
+      0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.8; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ─── GLOW ORBS BACKGROUND ─── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: orbPulse 8s ease-in-out infinite;
+      z-index: 0;
+    }
+    .orb-1 { width: 500px; height: 500px; background: var(--rose); top: -100px; left: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: #7a1432; bottom: -80px; right: -80px; animation-delay: -4s; }
+    .orb-3 { width: 300px; height: 300px; background: var(--gold); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -2s; opacity: 0.08; }
+
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.18; }
+      50%       { transform: scale(1.15); opacity: 0.25; }
+    }
+
+    /* ─── CARD ─── */
+    .card {
+      position: relative;
+      z-index: 10;
+      background: linear-gradient(145deg, rgba(255,248,240,0.97), rgba(252,232,237,0.97));
+      border-radius: 24px;
+      padding: 52px 48px 90px;
+      max-width: 480px;
+      width: 90vw;
+      text-align: center;
+      min-height: 420px;
+      box-shadow:
+        0 0 0 1px rgba(212,168,83,0.35),
+        0 30px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+      animation: cardReveal 1.2s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes cardReveal {
+      0%   { opacity: 0; transform: scale(0.6) translateY(40px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* decorative top border */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 3px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      border-radius: 2px;
+    }
+
+    .envelope-icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 6px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    .subtitle {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 5vw, 36px);
+      color: var(--dark);
+      line-height: 1.3;
+      margin-bottom: 14px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--rose);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(232,39,75,0.3));
+    }
+    .divider::after {
+      background: linear-gradient(to left, transparent, rgba(232,39,75,0.3));
+    }
+    .divider-heart { color: var(--rose); font-size: 14px; }
+
+    .message {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: #5a3040;
+      line-height: 1.7;
+      margin-bottom: 30px;
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn-group {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+
+    #yesBtn {
+      background: linear-gradient(135deg, var(--rose), #c0183a);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(232,39,75,0.5), 0 0 0 0 rgba(232,39,75,0.4);
+      animation: yesGlow 2.5s ease-in-out infinite;
+    }
+    @keyframes yesGlow {
+      0%,100% { box-shadow: 0 6px 24px rgba(232,39,75,0.5), 0 0 0 0 rgba(232,39,75,0.3); }
+      50%      { box-shadow: 0 6px 32px rgba(232,39,75,0.7), 0 0 0 12px rgba(232,39,75,0); }
+    }
+    #yesBtn:hover { transform: scale(1.08) translateY(-2px); }
+
+    #noBtn {
+      background: transparent;
+      color: #9a6070;
+      border: 1.5px solid rgba(154,96,112,0.4);
+      position: absolute;
+      white-space: nowrap;
+      transition: left 0.4s cubic-bezier(0.25,1.6,0.5,1),
+                  top 0.4s cubic-bezier(0.25,1.6,0.5,1);
+      z-index: 20;
+    }
+    #noBtn:hover { background: rgba(154,96,112,0.08); }
+
+    /* ─── RESPONSE ─── */
+    #response {
+      margin-top: 22px;
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--rose);
+      min-height: 28px;
+      animation: fadeIn 0.8s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── CELEBRATION PARTICLES ─── */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 50;
+      animation: particleFly linear forwards;
+    }
+    @keyframes particleFly {
+      0%   { opacity: 1; }
+      100% { opacity: 0; transform: var(--fly); }
+    }
+
+    /* ─── YES SCREEN ─── */
+    #yesScreen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #0d0007, #1a0010);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      animation: screenReveal 0.8s ease both;
+    }
+    @keyframes screenReveal {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    #yesScreen.show { display: flex; }
+
+    .big-heart {
+      font-size: 80px;
+      animation: heartBeat 1s ease-in-out infinite;
+      display: block;
+      margin-bottom: 16px;
+    }
+    @keyframes heartBeat {
+      0%,100% { transform: scale(1); }
+      14%     { transform: scale(1.18); }
+      28%     { transform: scale(1); }
+      42%     { transform: scale(1.12); }
+      56%     { transform: scale(1); }
+    }
+
+    .yes-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 7vw, 56px);
+      color: #fff;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .yes-title span { color: var(--rose-light); }
+
+    .yes-sub {
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 16px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+    }
+
+    #floatingHearts canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 101;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Starfield -->
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- Main Card -->
+  <div class="card" id="mainCard">
+    <span class="envelope-icon">💌</span>
+    <p class="subtitle">A message from the heart</p>
+    <h1>Will you be my <em>Valentine?</em></h1>
+
+    <div class="divider"><span class="divider-heart">♥</span></div>
+
+    <div class="btn-group">
+      <button class="btn" id="yesBtn">Yes, Always 💖</button>
+    </div>
+    <button class="btn" id="noBtn">No 💔</button>
+
+    <p id="response"></p>
+  </div>
+
+  <!-- YES full-screen -->
+  <div id="yesScreen">
+    <span class="big-heart">❤️</span>
+    <h2 class="yes-title">You said <span>YES!</span></h2>
+    <p class="yes-sub">Today & every day ✨</p>
+  </div>
+
+  <script>
+    /* ───────────────────────────────
+       STARS
+    ─────────────────────────────── */
+    const canvas = document.getElementById('stars-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    for (let i = 0; i < 180; i++) {
+      stars.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 1.4 + 0.2,
+        alpha: Math.random(),
+        speed: Math.random() * 0.008 + 0.003,
+        dir: Math.random() > 0.5 ? 1 : -1
+      });
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.alpha += s.speed * s.dir;
+        if (s.alpha >= 1 || s.alpha <= 0) s.dir *= -1;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,240,250,${s.alpha})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    /* ───────────────────────────────
+       FALLING PETALS
+    ─────────────────────────────── */
+    const petalColors = ['#e8274b','#f5607a','#ffa0b4','#d4a853','#ff6b8a'];
+    function createPetal() {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        background: ${petalColors[Math.floor(Math.random() * petalColors.length)]};
+        opacity: 0;
+        animation-duration: ${4 + Math.random() * 5}s;
+        animation-delay: ${Math.random() * 6}s;
+        transform: rotate(${Math.random() * 360}deg);
+        width: ${8 + Math.random() * 10}px;
+        height: ${12 + Math.random() * 14}px;
+      `;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 12000);
+    }
+    for (let i = 0; i < 24; i++) createPetal();
+    setInterval(createPetal, 700);
+
+    /* ───────────────────────────────
+       NO BUTTON RUNAWAY (stays inside card)
+    ─────────────────────────────── */
+    const noBtn = document.getElementById('noBtn');
+    const mainCard = document.getElementById('mainCard');
+
+    // Place No button initially next to Yes button
+    function positionNoBtnInitial() {
+      const cardW = mainCard.offsetWidth;
+      const cardH = mainCard.offsetHeight;
+      const btnW  = noBtn.offsetWidth;
+      const btnH  = noBtn.offsetHeight;
+      // Start: bottom-right area near yes button
+      noBtn.style.left = (cardW / 2 + 8) + 'px';
+      noBtn.style.top  = (cardH - btnH - 44) + 'px';
+    }
+    positionNoBtnInitial();
+
+    noBtn.addEventListener('mouseover', runAway);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); runAway(); });
+
+    function runAway() {
+      const cardW  = mainCard.offsetWidth;
+      const cardH  = mainCard.offsetHeight;
+      const btnW   = noBtn.offsetWidth;
+      const btnH   = noBtn.offsetHeight;
+      const pad    = 16;
+
+      // Random position fully inside card
+      const maxX = cardW - btnW - pad;
+      const maxY = cardH - btnH - pad;
+      const x = pad + Math.random() * maxX;
+      const y = pad + Math.random() * maxY;
+
+      noBtn.style.left = x + 'px';
+      noBtn.style.top  = y + 'px';
+    }
+
+    /* ───────────────────────────────
+       YES BUTTON
+    ─────────────────────────────── */
+    document.getElementById('yesBtn').addEventListener('click', () => {
+      burstParticles();
+      setTimeout(() => {
+        document.getElementById('yesScreen').classList.add('show');
+        launchCelebration();
+      }, 600);
+    });
+
+    /* ───────────────────────────────
+       BURST PARTICLES ON CLICK
+    ─────────────────────────────── */
+    function burstParticles() {
+      const emojis = ['❤️','💕','✨','🌸','💖','🎉','💗'];
+      for (let i = 0; i < 30; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.fontSize = (14 + Math.random() * 20) + 'px';
+        el.style.left = (30 + Math.random() * 40) + 'vw';
+        el.style.top  = (30 + Math.random() * 40) + 'vh';
+        const angle = Math.random() * 360;
+        const dist  = 100 + Math.random() * 200;
+        const dx = Math.cos(angle * Math.PI/180) * dist;
+        const dy = Math.sin(angle * Math.PI/180) * dist;
+        el.style.setProperty('--fly', `translate(${dx}px, ${dy}px) scale(0)`);
+        el.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1500);
+      }
+    }
+
+    /* ───────────────────────────────
+       CELEBRATION CANVAS (YES SCREEN)
+    ─────────────────────────────── */
+    function launchCelebration() {
+      const cc = document.createElement('canvas');
+      cc.style.cssText = 'position:fixed;inset:0;z-index:102;pointer-events:none;';
+      document.getElementById('yesScreen').appendChild(cc);
+      cc.width  = window.innerWidth;
+      cc.height = window.innerHeight;
+      const cx  = cc.getContext('2d');
+
+      const items = [];
+      const colors = ['#e8274b','#f5607a','#d4a853','#ffa0b4','#ffffff','#ff6b8a'];
+
+      for (let i = 0; i < 120; i++) {
+        items.push({
+          x: Math.random() * cc.width,
+          y: -20 - Math.random() * cc.height,
+          r: 4 + Math.random() * 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 2,
+          vy: 1.5 + Math.random() * 2.5,
+          gravity: 0.04,
+          spin: (Math.random() - 0.5) * 0.2,
+          angle: Math.random() * Math.PI * 2,
+          shape: Math.random() > 0.5 ? 'rect' : 'circle'
+        });
+      }
+
+      let frame = 0;
+      function animConf() {
+        cx.clearRect(0, 0, cc.width, cc.height);
+        items.forEach(p => {
+          p.x  += p.vx;
+          p.y  += p.vy;
+          p.vy += p.gravity;
+          p.angle += p.spin;
+          cx.save();
+          cx.translate(p.x, p.y);
+          cx.rotate(p.angle);
+          cx.fillStyle = p.color;
+          cx.globalAlpha = Math.max(0, 1 - frame / 220);
+          if (p.shape === 'rect') {
+            cx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r);
+          } else {
+            cx.beginPath();
+            cx.arc(0, 0, p.r * 0.7, 0, Math.PI * 2);
+            cx.fill();
+          }
+          cx.restore();
+        });
+        frame++;
+        if (frame < 260) requestAnimationFrame(animConf);
+        else cc.remove();
+      }
+      animConf();
+
+      // Floating hearts on yes screen
+      setInterval(() => {
+        const h = document.createElement('div');
+        h.style.cssText = `
+          position:fixed;
+          font-size:${20+Math.random()*30}px;
+          left:${Math.random()*100}vw;
+          bottom:-40px;
+          z-index:103;
+          animation: petalFall 4s linear forwards;
+          opacity:0;
+        `;
+        h.innerText = ['❤️','💕','💖','🌸','✨'][Math.floor(Math.random()*5)];
+        document.getElementById('yesScreen').appendChild(h);
+        setTimeout(() => h.remove(), 4500);
+      }, 300);
+    }
+  </script>
+</body>
+</html>
