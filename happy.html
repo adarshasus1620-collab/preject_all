@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    height: 100vh; width: 100vw;
+    overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
+    display: flex; flex-direction: column;
+  }
+  .title {
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem; color: #fff;
+    padding: 16px 0 8px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 0.4s;
+    flex-shrink: 0;
+  }
+  .scene {
+    flex: 1; display: flex;
+    align-items: center; min-height: 0;
+  }
+  .greeting {
+    width: 33%; padding-left: 16px;
+    color: #fff; font-size: 0.78rem;
+    line-height: 2.1; flex-shrink: 0;
+  }
+  .greeting .name {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.05rem; color: #ff6b9d;
+    display: block; margin-bottom: 5px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards 4s;
+  }
+  .greeting .line {
+    display: block; opacity: 0;
+    animation: fadeIn 0.4s ease forwards;
+  }
+  .greeting .line:nth-child(2) { animation-delay: 4.4s; }
+  .greeting .line:nth-child(3) { animation-delay: 4.8s; }
+  .greeting .line:nth-child(4) { animation-delay: 5.2s; }
+  .greeting .line:nth-child(5) { animation-delay: 5.6s; }
+  .greeting .line:nth-child(6) { animation-delay: 6.0s; }
+  .greeting .line:nth-child(7) { animation-delay: 6.4s; }
+  .greeting .line:nth-child(8) { animation-delay: 6.8s; }
+  .tree-wrap {
+    flex: 1; height: 100%;
+    position: relative; min-width: 0;
+  }
+  canvas {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="title">Happy Birthday ❤️ 💕</div>
+<div class="scene">
+  <div class="greeting">
+    <span class="name">Hey you ✔️</span>
+    <span class="line">Happy Birthday 🎂</span>
+    <span class="line">May God bless you 🌿</span>
+    <span class="line">And give u many happiness ✔️</span>
+    <span class="line">Just saying... you're pretty awesome 💛</span>
+    <span class="line">Sending good vibes and maybe a wink 😉</span>
+    <span class="line">Hope u have a great day today 🌸</span>
+    <span class="line">You deserve the world 👑</span>
+  </div>
+  <div class="tree-wrap">
+    <canvas id="c"></canvas>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const COLORS = [
+  '#ff3366','#ff6b9d','#ff85b3','#ffb3d1','#ff1493','#ff69b4',
+  '#ffd700','#ffb300','#da70d6','#ff8c00','#ff6347','#ff4500',
+  '#ee82ee','#ffcc00','#ff007f','#c71585','#ff77aa','#ff0044','#ffaa00'
+];
+
+let hearts = [], startTime = null;
+
+function easeOut(t) { return 1 - Math.pow(1-t, 3); }
+
+function setup() {
+  canvas.width  = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+  buildHearts();
+}
+
+function drawHeart(x, y, s, color, alpha) {
+  ctx.save();
+  ctx.globalAlpha = Math.min(Math.max(alpha,0),1);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x, y+s*0.3);
+  ctx.bezierCurveTo(x,y,       x-s,y,       x-s,y+s*0.4);
+  ctx.bezierCurveTo(x-s,y+s,   x,  y+s*1.3, x,  y+s*1.5);
+  ctx.bezierCurveTo(x,y+s*1.3, x+s,y+s,     x+s,y+s*0.4);
+  ctx.bezierCurveTo(x+s,y,     x,  y,        x,  y+s*0.3);
+  ctx.fill();
+  ctx.restore();
+}
+
+function buildHearts() {
+  hearts = [];
+  const W = canvas.width, H = canvas.height;
+  const cx = W * 0.52;
+  const cy = H * 0.34;
+  const R  = Math.min(W * 0.38, H * 0.38);
+  let added = 0, attempts = 0;
+  while (added < 320 && attempts < 12000) {
+    attempts++;
+    const t = Math.random() * Math.PI * 2;
+    const r = Math.sqrt(Math.random());
+    const hbx = 16 * Math.pow(Math.sin(t), 3);
+    const hby = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+    const sc  = R / 16;
+    const px  = cx + hbx*sc*r + (Math.random()-0.5)*5;
+    const py  = cy + hby*sc*r + (Math.random()-0.5)*5;
+    if (px<2||px>W-2||py<2||py>H-2) continue;
+    hearts.push({
+      x:px, y:py,
+      size: 4 + Math.random()*10,
+      color: COLORS[Math.floor(Math.random()*COLORS.length)],
+      delay: added*7 + Math.random()*80
+    });
+    added++;
+  }
+}
+
+function drawTrunk(cx, trunkTopY, trunkBotY, progress) {
+  const p   = easeOut(progress);
+  const curTop = trunkBotY - (trunkBotY - trunkTopY) * p;
+
+  const baseW = 38;   // mota base
+  const topW  = 20;   // thoda patla top
+  const midY  = (trunkBotY + curTop) / 2;
+
+  // === TRUNK FILL ===
+  const g = ctx.createLinearGradient(cx-baseW/2, trunkBotY, cx+baseW/2, curTop);
+  g.addColorStop(0,   'rgba(255,190,215,1)');
+  g.addColorStop(0.5, 'rgba(255,170,200,0.97)');
+  g.addColorStop(1,   'rgba(255,155,190,0.85)');
+
+  ctx.save();
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  // Left side — curved inward slightly
+  ctx.moveTo(cx - baseW/2, trunkBotY);
+  ctx.bezierCurveTo(
+    cx - baseW/2 + 3, midY,
+    cx - topW/2 - 2,  midY,
+    cx - topW/2,      curTop
+  );
+  ctx.lineTo(cx + topW/2, curTop);
+  // Right side — curved
+  ctx.bezierCurveTo(
+    cx + topW/2 + 2, midY,
+    cx + baseW/2 - 3, midY,
+    cx + baseW/2,    trunkBotY
+  );
+  ctx.closePath();
+  ctx.fill();
+
+  // Highlight stripe
+  const hl = ctx.createLinearGradient(cx, trunkBotY, cx, curTop);
+  hl.addColorStop(0, 'rgba(255,230,240,0.35)');
+  hl.addColorStop(1, 'rgba(255,230,240,0.05)');
+  ctx.fillStyle = hl;
+  ctx.beginPath();
+  ctx.moveTo(cx-6, trunkBotY-5);
+  ctx.bezierCurveTo(cx-5, midY, cx-3, midY, cx-3, curTop+5);
+  ctx.lineTo(cx+3, curTop+5);
+  ctx.bezierCurveTo(cx+3, midY, cx+5, midY, cx+6, trunkBotY-5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // === ROOTS ===
+  if (progress > 0.55) {
+    const rp = easeOut((progress-0.55)/0.45);
+    const rootDefs = [
+      { ox:-baseW/2, angle: 0.9,  len:0.18, w:10, curve:0.4 },
+      { ox: baseW/2, angle:-0.9,  len:0.18, w:10, curve:0.4 },
+      { ox:-baseW/3, angle: 1.3,  len:0.13, w: 7, curve:0.3 },
+      { ox: baseW/3, angle:-1.3,  len:0.13, w: 7, curve:0.3 },
+      { ox:-baseW/2, angle: 1.6,  len:0.09, w: 5, curve:0.2 },
+      { ox: baseW/2, angle:-1.6,  len:0.09, w: 5, curve:0.2 },
+    ];
+    const trunkH = trunkBotY - trunkTopY;
+    ctx.save();
+    ctx.lineCap = 'round';
+    rootDefs.forEach(r => {
+      const rLen   = trunkH * r.len * rp;
+      const startX = cx + r.ox;
+      const startY = trunkBotY - 8;
+      const endX   = startX + Math.cos(r.angle) * rLen;
+      const endY   = startY + Math.sin(r.angle) * rLen * 0.5;
+      const ctrlX  = startX + Math.cos(r.angle)*rLen*r.curve;
+      const ctrlY  = startY + Math.sin(r.angle)*rLen*0.8;
+
+      const rg = ctx.createLinearGradient(startX, startY, endX, endY);
+      rg.addColorStop(0, `rgba(255,190,215,${0.9*rp})`);
+      rg.addColorStop(1, `rgba(255,190,215,0)`);
+      ctx.strokeStyle = rg;
+      ctx.lineWidth   = r.w * rp;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  // === BRANCHES near top ===
+  if (progress > 0.78) {
+    const bp = easeOut((progress-0.78)/0.22);
+    const trunkH = trunkBotY - trunkTopY;
+    const by = curTop + 15;
+    const branchDefs = [
+      { dx:-1.1, dy:-0.5, len:0.12, w:9 },
+      { dx: 1.1, dy:-0.5, len:0.12, w:9 },
+      { dx:-0.6, dy:-0.9, len:0.09, w:6 },
+      { dx: 0.6, dy:-0.9, len:0.09, w:6 },
+      { dx:-1.3, dy:-0.2, len:0.08, w:5 },
+      { dx: 1.3, dy:-0.2, len:0.08, w:5 },
+    ];
+    ctx.save();
+    ctx.lineCap = 'round';
+    branchDefs.forEach(b => {
+      const bLen = trunkH * b.len * bp;
+      const bg = ctx.createLinearGradient(cx, by, cx+b.dx*bLen, by+b.dy*bLen);
+      bg.addColorStop(0, `rgba(255,185,210,0.95)`);
+      bg.addColorStop(1, `rgba(255,185,210,0.3)`);
+      ctx.strokeStyle = bg;
+      ctx.lineWidth   = b.w * bp;
+      ctx.beginPath();
+      ctx.moveTo(cx, by);
+      ctx.quadraticCurveTo(
+        cx + b.dx*bLen*0.5, by + b.dy*bLen*0.3,
+        cx + b.dx*bLen,     by + b.dy*bLen
+      );
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+}
+
+function draw(ts) {
+  if (!startTime) startTime = ts;
+  const elapsed = ts - startTime;
+
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const cx       = W * 0.52;
+  const R        = Math.min(W*0.38, H*0.38);
+  const cy       = H * 0.34;
+  const trunkTopY = cy + R * 0.78;
+  const trunkBotY = H * 0.97;
+
+  const tp = Math.min(elapsed / 1100, 1);
+  drawTrunk(cx, trunkTopY, trunkBotY, tp);
+
+  if (elapsed > 800) {
+    const base = elapsed - 800;
+    for (const h of hearts) {
+      if (base < h.delay) continue;
+      const a = Math.min((base-h.delay)/300, 1);
+      drawHeart(h.x, h.y, h.size, h.color, a);
+    }
+  }
+
+  requestAnimationFrame(draw);
+}
+
+function start() {
+  setup();
+  startTime = null;
+  requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', start);
+setTimeout(start, 100);
+</script>
+</body>
+</html>
